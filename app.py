@@ -8,7 +8,7 @@ CORS(app)
 usuarios = []
 admin=[]
 publicaciones=[]
-admin.append(Registro("Darwin Arevalo","admin@ipc1.com","admin","M","admin@ipc1"))
+admin.append(Registro("Darwin Arevalo","admin@ipc1.com","admin@ipc1","M","admin"))
 usuarios.append(Registro("home-1","eee@gaa","123contrasenia","f","home"))
 usuarios.append(Registro("home-2","be@gaa.com","12carreraa","M","home1"))
 usuarios.append(Registro("home-3","ebe@gaa.com","123322nuevo","f","home2"))
