@@ -8,19 +8,17 @@ class Registro:
 
     def Mostrar (self):
         return{
-
             "correo" : self.correo,
             "contrasenia" : self.contrasenia,
             "nombre": self.nombre,
             "genero" : self.genero,
             "Usname" : self.usname
-
         }    
 
     def Mostrar_usuario(self):
         return(self.usname)
 
-    def Modificar(self, nombre,correo,contrasenia,genero,usname):
+    def ModificarDatosUsuario(self, nombre,correo,contrasenia,genero,usname):
         self.correo = correo
         self.contrasenia = contrasenia
         self.nombre = nombre

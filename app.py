@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, json
 from flask_cors import CORS
 from werkzeug.exceptions import LengthRequired
 from Registro import Registro
@@ -8,10 +8,10 @@ CORS(app)
 usuarios = []
 admin=[]
 publicaciones=[]
-admin.append(Registro("admin","ebeee@gaa","admin","M","admin"))
-usuarios.append(Registro("home","ebeee@gaa","123","M","home"))
-usuarios.append(Registro("home","ebeee@gaa","123","M","home1"))
-usuarios.append(Registro("home","ebeee@gaa","123","M","home2"))
+admin.append(Registro("admin","eb@gaa","admin","M","admin"))
+usuarios.append(Registro("home-1","eee@gaa","123","f","home"))
+usuarios.append(Registro("home-2","be@gaa","1235","M","home1"))
+usuarios.append(Registro("home-3","ebe@gaa","123322","f","home2"))
 
 
 #mostrar usuarios
@@ -26,15 +26,32 @@ def mostrar():
         respuesta.append(u.Mostrar())
 
     return(jsonify(respuesta))
+
+@app.route('/Obtener/<string:username>', methods=['GET'])
+def obtenerUsuario(username):
+    global usuarios
+    respuesta =[]
+    for u in admin:
+        if(u.Mostrar_usuario() == username):
+            respuesta.append(u.Mostrar())
+            break
+    for u in usuarios:
+        if(u.Mostrar_usuario() == username):
+            respuesta.append(u.Mostrar())
+            break
+
+    return(jsonify(respuesta))
     
 @app.route('/eliminar/<string:username>', methods=['DELETE'])
 def Eliminar(username):
     global usuarios  
     verificacion=0
     for a in range(len(usuarios)):
+        
         if  usuarios[a].Mostrar_usuario() == username:
             del usuarios[a]
             verificacion=1
+            break
 
     if verificacion==1:        
         return(jsonify({"mensaje" : "usuario eliminado"}))
@@ -51,57 +68,69 @@ def Modificar(username):
             correo=request.json["email"]
             genero=request.json["genero"]
             usrname=request.json["username"]
-            u.Modificar(nombre,contrasenia,correo,genero,usrname)
+            for i in usuarios:
+                if i.Mostrar_usuario()==usrname:
+                    return(jsonify({"mensaje" : "usuario ya registrado con ese username"}))
 
-    return(jsonify({"mensaje" : "usuario modificado"}))       
+            u.ModificarDatosUsuario(nombre,correo,contrasenia,genero,usrname)
+            return(jsonify({"mensaje" : "usuario modificado"}))
+            
+
+    return(jsonify({"mensaje" : "usuario no modificado"}))
+
 
 @app.route('/iniciar/', methods=['POST'])
 def Iniciar():
     global usuarios
-    verificacion=0
+
     username=request.json["username"]
     password=request.json["password"]
     for u in admin:
         if (u.Mostrar_pas()== password and u.Mostrar_usuario()==username):
-            verificacion=3
+            return(jsonify({'message': "024"}))  
 
     for u in usuarios:
         if (u.Mostrar_pas()== password and u.Mostrar_usuario()==username):
-            verificacion=1
-        else:
-            verifiacion=2
-            
-    if verificacion==1:
-        return(jsonify({'message' : "022"})) 
-    elif verificacion==2:
-        return(jsonify({'message': "023"}))
-    elif verificacion==3:
-        return(jsonify({'message': "024"}))         
+            return(jsonify({'message' : "022"}))
+
+    return(jsonify({'message': "023"}))
+               
 
 @app.route('/registrar/', methods=['POST'])
 def Registrar():
     global usuarios
-    verificacion=0
+    cont=0
+    num="1234567890"
     nombre=request.json["nombre"]
     contrasenia=request.json["passwordn"]
     correo=request.json["email"]
     genero=request.json["genero"]
     usname=request.json["usernamen"]
+    if len(contrasenia)<8:
+        return(jsonify({'message' : "02"}))    
+    for caracter in contrasenia:
+        for caracter1 in num:
+            if caracter==caracter1:
+                cont=+1
+    if cont==0:
+             return(jsonify({'message' : "01"}))  
+
     for u in usuarios:
         if u.Mostrar_usuario()==usname:
-            verificacion=1
+            return(jsonify({'message' : "020"})) 
             
-        else:
-            verificacion=2
-             
-    if verificacion==1:
-        return(jsonify({'message' : "020"})) 
+    usuarios.append(Registro(nombre,correo,contrasenia,genero,usname))
+    return(jsonify({"message" : "025"}))  
 
-    elif verificacion==2:
-        usuarios.append(Registro(nombre,correo,contrasenia,genero,usname))
-        return(jsonify({"message" : "025"}))  
+@app.route('/load-users',methods=['POST'] )
+def LoadUsers():
+    if request.method=='POST':
+        params=json.load(request.files['document'])
 
-    
+        for usuarios in params:
+            print(usuarios['name'])
+
+        return (jsonify({"status" : "200"}))    
 
 if __name__=="__main__":
     app.run(threaded=True, debug=True, port=5000)
